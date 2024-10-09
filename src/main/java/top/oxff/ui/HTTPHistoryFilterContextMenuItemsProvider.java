@@ -1,6 +1,7 @@
 package top.oxff.ui;
 
 import burp.api.montoya.MontoyaApi;
+import burp.api.montoya.core.HighlightColor;
 import burp.api.montoya.core.ToolType;
 import burp.api.montoya.proxy.ProxyHttpRequestResponse;
 import burp.api.montoya.ui.contextmenu.ContextMenuEvent;
@@ -33,13 +34,13 @@ public class HTTPHistoryFilterContextMenuItemsProvider implements ContextMenuIte
             return null;
         }
         List<Component> menuItemList = new ArrayList<>();
-        JMenu filterByImportFileMenu = new JMenu("filterByImportFile");
-        JMenuItem filterByImportFileMenuItemWithDuplication = new JMenuItem("filterByImportFileMenuItemWithDuplication");
-        JMenuItem filterByImportFileMenuItemWithoutDuplication = new JMenuItem("filterByImportFileMenuItemWithoutDuplication");
+        JMenu filterByImportFileMenu = new JMenu("导入文本文件过滤");
+        JMenuItem filterByImportFileMenuItemWithDuplication = new JMenuItem("不去重");
+        JMenuItem filterByImportFileMenuItemWithoutDuplication = new JMenuItem("去重");
 
-        JMenu filterByClipboardMenu = new JMenu("filterByClipboard");
-        JMenuItem filterByClipboardMenuItemWithDuplication = new JMenuItem("filterByClipboardMenuItemWithDuplication");
-        JMenuItem filterByClipboardMenuItemWithoutDuplication = new JMenuItem("filterByClipboardMenuItemWithoutDuplication");
+        JMenu filterByClipboardMenu = new JMenu("粘贴板过滤");
+        JMenuItem filterByClipboardMenuItemWithDuplication = new JMenuItem("不去重");
+        JMenuItem filterByClipboardMenuItemWithoutDuplication = new JMenuItem("去重");
 
         initFilterByImportFileMenuItemWithDuplication(filterByImportFileMenuItemWithDuplication);
         initFilterByClipboardMenuItemWithDuplication(filterByClipboardMenuItemWithDuplication);
@@ -84,7 +85,30 @@ public class HTTPHistoryFilterContextMenuItemsProvider implements ContextMenuIte
                     requestMethodPathHttpVersionSet.add(requestMethodPathHttpVersion);
                 }
             }
-            SwingUtilities.invokeLater(()-> withoutDuplicationProxyHttpRequestResponses.forEach(proxyHttpRequestResponse -> proxyHttpRequestResponse.annotations().setNotes("[HTTPHistoryFilter]")));
+            FilterMarkConfigDialog filterMarkConfigDialog = new FilterMarkConfigDialog(this, withoutDuplicationProxyHttpRequestResponses);
+            filterMarkConfigDialog.setVisible(true);
+        });
+    }
+    private void initFilterByImportFileMenuItemWithDuplication(JMenuItem filterByImportFileMenuItemWithDuplication) {
+        filterByImportFileMenuItemWithDuplication.addActionListener(e -> {
+            String path = Tools.selectFile();
+            if (path == null) {
+                return;
+            }
+            List<String> lines;
+            try {
+                lines = Tools.readLinesFromFile(path);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            if(lines.isEmpty()){
+                return;
+            }
+            List<FilterItem> filterItems = Tools.parseFilterItems(lines);
+            MyProxyHistoryFilter myProxyHistoryFilter = new MyProxyHistoryFilter(filterItems);
+            List<ProxyHttpRequestResponse> proxyHttpRequestResponses = api.proxy().history(myProxyHistoryFilter);
+            FilterMarkConfigDialog filterMarkConfigDialog = new FilterMarkConfigDialog(this, proxyHttpRequestResponses);
+            filterMarkConfigDialog.setVisible(true);
         });
     }
 
@@ -110,37 +134,15 @@ public class HTTPHistoryFilterContextMenuItemsProvider implements ContextMenuIte
                             requestMethodPathHttpVersionSet.add(requestMethodPathHttpVersion);
                         }
                     }
-                    SwingUtilities.invokeLater(()-> withoutDuplicationProxyHttpRequestResponses.forEach(proxyHttpRequestResponse -> proxyHttpRequestResponse.annotations().setNotes("[HTTPHistoryFilter]")));
-
+                    api.logging().logToOutput("HTTP History Filter: " + clipboardContent);
+                    FilterMarkConfigDialog filterMarkConfigDialog = new FilterMarkConfigDialog(this, withoutDuplicationProxyHttpRequestResponses);
+                    filterMarkConfigDialog.setVisible(true);
                 }
             } catch (IOException | UnsupportedFlavorException ex) {
                 throw new RuntimeException(ex);
             }
         });
     }
-
-    private void initFilterByImportFileMenuItemWithDuplication(JMenuItem filterByImportFileMenuItemWithDuplication) {
-        filterByImportFileMenuItemWithDuplication.addActionListener(e -> {
-            String path = Tools.selectFile();
-            if (path == null) {
-                return;
-            }
-            List<String> lines;
-            try {
-                lines = Tools.readLinesFromFile(path);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            if(lines.isEmpty()){
-                return;
-            }
-            List<FilterItem> filterItems = Tools.parseFilterItems(lines);
-            MyProxyHistoryFilter myProxyHistoryFilter = new MyProxyHistoryFilter(filterItems);
-            List<ProxyHttpRequestResponse> proxyHttpRequestResponses = api.proxy().history(myProxyHistoryFilter);
-            proxyHttpRequestResponses.forEach(proxyHttpRequestResponse -> proxyHttpRequestResponse.annotations().setNotes("[HTTPHistoryFilter]"));
-        });
-    }
-
     private void initFilterByClipboardMenuItemWithDuplication(JMenuItem filterByClipboardMenuItemWithDuplication) {
         filterByClipboardMenuItemWithDuplication.addActionListener(e -> {
             try {
@@ -154,11 +156,31 @@ public class HTTPHistoryFilterContextMenuItemsProvider implements ContextMenuIte
                     }
                     MyProxyHistoryFilter myProxyHistoryFilter = new MyProxyHistoryFilter(filterItems);
                     List<ProxyHttpRequestResponse> proxyHttpRequestResponses = api.proxy().history(myProxyHistoryFilter);
-                    proxyHttpRequestResponses.forEach(proxyHttpRequestResponse -> proxyHttpRequestResponse.annotations().setNotes("[HTTPHistoryFilter]"));
+                    api.logging().logToOutput("HTTP History Filter: " + clipboardContent);
+                    FilterMarkConfigDialog filterMarkConfigDialog = new FilterMarkConfigDialog(this, proxyHttpRequestResponses);
+                    filterMarkConfigDialog.setVisible(true);
                 }
             } catch (IOException | UnsupportedFlavorException ex) {
                 throw new RuntimeException(ex);
             }
+        });
+    }
+
+    public void note(List<ProxyHttpRequestResponse> proxyHttpRequestResponseList, String note, boolean clearOldNote) {
+        SwingUtilities.invokeLater(()->{
+            if (clearOldNote){
+                api.proxy().history().forEach(proxyHttpRequestResponse -> proxyHttpRequestResponse.annotations().setNotes(""));
+            }
+            proxyHttpRequestResponseList.forEach(proxyHttpRequestResponse -> proxyHttpRequestResponse.annotations().setNotes(note));
+        });
+    }
+
+    public void highlight(List<ProxyHttpRequestResponse> proxyHttpRequestResponseList, HighlightColor highlightColor, boolean clearOldHighlight) {
+        SwingUtilities.invokeLater(()->{
+            if (clearOldHighlight){
+                api.proxy().history().forEach(proxyHttpRequestResponse -> proxyHttpRequestResponse.annotations().setHighlightColor(HighlightColor.NONE));
+            }
+            proxyHttpRequestResponseList.forEach(proxyHttpRequestResponse -> proxyHttpRequestResponse.annotations().setHighlightColor(highlightColor));
         });
     }
 }
