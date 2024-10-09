@@ -1,5 +1,6 @@
 package top.oxff.controler;
 
+import burp.api.montoya.proxy.Proxy;
 import burp.api.montoya.proxy.ProxyHistoryFilter;
 import burp.api.montoya.proxy.ProxyHttpRequestResponse;
 import top.oxff.model.FilterItem;
@@ -26,6 +27,8 @@ public class MyProxyHistoryFilter implements ProxyHistoryFilter {
     public void clearFilterItems(){
         filterItems.clear();
     }
+
+
 
 
     @Override
