@@ -15,20 +15,6 @@ public class MyProxyHistoryFilter implements ProxyHistoryFilter {
         this.filterItems = filterItems;
     }
 
-    public void setFilterItems(List<FilterItem> filterItems){
-        this.filterItems = filterItems;
-    }
-
-    public List<FilterItem> getFilterItems(){
-        return filterItems;
-    }
-
-    public void clearFilterItems(){
-        filterItems.clear();
-    }
-
-
-
 
     @Override
     public boolean matches(ProxyHttpRequestResponse proxyHttpRequestResponse) {
