@@ -8,7 +8,7 @@ import top.oxff.utils.Tools;
 import java.util.List;
 
 public class MyProxyHistoryFilter implements ProxyHistoryFilter {
-    private List<FilterItem> filterItems;
+    private final List<FilterItem> filterItems;
 
     public MyProxyHistoryFilter(List<FilterItem> filterItems)
     {
