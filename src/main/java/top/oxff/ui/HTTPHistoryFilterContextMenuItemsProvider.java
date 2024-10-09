@@ -47,6 +47,11 @@ public class HTTPHistoryFilterContextMenuItemsProvider implements ContextMenuIte
         initFilterByImportFileMenuItemWithoutDuplication(filterByImportFileMenuItemWithoutDuplication);
         initFilterByClipboardMenuItemWithoutDuplication(filterByClipboardMenuItemWithoutDuplication);
 
+        filterByClipboardMenu.add(filterByClipboardMenuItemWithDuplication);
+        filterByClipboardMenu.add(filterByClipboardMenuItemWithoutDuplication);
+        filterByImportFileMenu.add(filterByImportFileMenuItemWithDuplication);
+        filterByImportFileMenu.add(filterByImportFileMenuItemWithoutDuplication);
+
         menuItemList.add(filterByImportFileMenu);
         menuItemList.add(filterByClipboardMenu);
         return menuItemList;

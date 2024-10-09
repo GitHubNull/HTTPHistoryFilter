@@ -1,5 +1,7 @@
 package top.oxff.model;
 
+import java.util.Objects;
+
 public class FilterItem {
     private String method;
     private String path;
@@ -36,5 +38,19 @@ public class FilterItem {
 
     public void setHttpVersion(String httpVersion) {
         this.httpVersion = httpVersion;
+    }
+
+    @Override
+    public String toString() {
+        return "FilterItem{" +
+                "method='" + method + '\'' +
+                ", path='" + path + '\'' +
+                ", httpVersion='" + httpVersion + '\'' +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(method, path, httpVersion);
     }
 }

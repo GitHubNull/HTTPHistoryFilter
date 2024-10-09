@@ -1,6 +1,5 @@
 package top.oxff.utils;
 
-import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.proxy.ProxyHttpRequestResponse;
 import top.oxff.model.FilterItem;
@@ -10,7 +9,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Tools {
 
@@ -67,7 +68,8 @@ public class Tools {
                 filterItems.add(filterItem);
             }
         }
-        return filterItems;
+        Set<FilterItem> filterItemSet = new HashSet<>(filterItems);
+        return new ArrayList<>(filterItemSet);
     }
 
     public static boolean isThisRequestWouldBeShown(FilterItem filterItem, ProxyHttpRequestResponse proxyHttpRequestResponse) {
