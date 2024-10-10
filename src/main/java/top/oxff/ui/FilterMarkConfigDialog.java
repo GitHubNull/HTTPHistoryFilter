@@ -81,10 +81,10 @@ public class FilterMarkConfigDialog extends javax.swing.JDialog{
         initComponentsActionListeners();
     }
 
-    public FilterMarkConfigDialog(){
-        initComponents();
-        initComponents();
-    }
+//    public FilterMarkConfigDialog(){
+//        initComponents();
+//        initComponents();
+//    }
 
     private void initComponents() {
         setLayout(new BorderLayout());
