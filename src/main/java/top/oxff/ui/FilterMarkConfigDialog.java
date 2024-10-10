@@ -1,10 +1,10 @@
 package top.oxff.ui;
 
-import burp.api.montoya.core.HighlightColor;
 import burp.api.montoya.proxy.ProxyHttpRequestResponse;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,16 +19,26 @@ public class FilterMarkConfigDialog extends javax.swing.JDialog{
     JRadioButton noteRadioButton;
     JRadioButton highlightRadioButton;
 
-    HighlightColor[] highlightColors = {
-            HighlightColor.RED,
-            HighlightColor.ORANGE,
-            HighlightColor.YELLOW,
-            HighlightColor.GREEN,
-            HighlightColor.CYAN,
-            HighlightColor.BLUE,
-            HighlightColor.PINK,
-            HighlightColor.MAGENTA,
-            HighlightColor.GRAY
+    Color[] highlightColors = {
+//            HighlightColor.RED,
+//            HighlightColor.ORANGE,
+//            HighlightColor.YELLOW,
+//            HighlightColor.GREEN,
+//            HighlightColor.CYAN,
+//            HighlightColor.BLUE,
+//            HighlightColor.PINK,
+//            HighlightColor.MAGENTA,
+//            HighlightColor.GRAY
+            Color.RED,
+            Color.ORANGE,
+            Color.YELLOW,
+            Color.GREEN,
+            Color.CYAN,
+            Color.BLUE,
+            Color.PINK,
+            Color.MAGENTA,
+            Color.GRAY
+
     };
     String[] highlightColorNames = {
             "Red",
@@ -42,7 +52,7 @@ public class FilterMarkConfigDialog extends javax.swing.JDialog{
             "Gray"
     };
 
-    Map<String, HighlightColor> highlightColorMap = new java.util.HashMap<>();
+    Map<String, Color> highlightColorMap = new HashMap<>();
 
     JPanel highlightPanel;
     ButtonGroup clearOrKeppHightLightButtonGroup;
@@ -71,6 +81,11 @@ public class FilterMarkConfigDialog extends javax.swing.JDialog{
         initComponentsActionListeners();
     }
 
+    public FilterMarkConfigDialog(){
+        initComponents();
+        initComponents();
+    }
+
     private void initComponents() {
         setLayout(new BorderLayout());
 
@@ -95,16 +110,50 @@ public class FilterMarkConfigDialog extends javax.swing.JDialog{
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                JLabel label = new JLabel("");
                 label.setOpaque(true);
-                if (isSelected){
-                    setForeground(getBackground());
-                    label.setBackground(list.getBackground());
-                }else{
-                    setForeground(Color.WHITE);
-                    label.setBackground(Color.getColor(highlightColorMap.get(value.toString()).name()));
+                if(null != value){
+                    label.setText((String) value);
+                    switch (value.toString()){
+                        case "Red":
+                            label.setBackground(Color.RED);
+                            break;
+                        case "Orange":
+                            label.setBackground(Color.ORANGE);
+                            break;
+                        case "Yellow":
+                            label.setBackground(Color.YELLOW);
+                            break;
+                        case "Green":
+                            label.setBackground(Color.GREEN);
+                            break;
+                        case "Cyan":
+                            label.setBackground(Color.CYAN);
+                            break;
+                        case "Blue":
+                            label.setBackground(Color.BLUE);
+                            break;
+                        case "Pink":
+                            label.setBackground(Color.PINK);
+                            break;
+                        case "Magenta":
+                            label.setBackground(Color.MAGENTA);
+                            break;
+                        case "Gray":
+                            label.setBackground(Color.GRAY);
+                            break;
+                        default:
+                            label.setBackground(Color.WHITE);
+                    }
+                    if (isSelected){
+                        label.setBackground(label.getBackground().darker());
+                        label.setForeground(Color.WHITE);
+                    }else{
+                        label.setForeground(Color.BLACK);
+                    }
                 }
-                return label;
+
+                return  label;
             }
         });
         highlightComboBox.setSelectedIndex(0);
@@ -252,4 +301,9 @@ public class FilterMarkConfigDialog extends javax.swing.JDialog{
         pack();
         setLocationRelativeTo(null);
     }
+
+//    public static void main(String[] args) {
+//        FilterMarkConfigDialog filterMarkConfigDialog = new FilterMarkConfigDialog();
+//        filterMarkConfigDialog.setVisible(true);
+//    }
 }

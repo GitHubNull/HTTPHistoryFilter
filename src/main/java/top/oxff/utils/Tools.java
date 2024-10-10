@@ -5,6 +5,11 @@ import burp.api.montoya.proxy.ProxyHttpRequestResponse;
 import top.oxff.model.FilterItem;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -84,5 +89,19 @@ public class Tools {
         String path = httpRequest.path();
         String httpVersion = httpRequest.httpVersion();
         return filterItem.getMethod().equals(method) && filterItem.getPath().equals(path) && filterItem.getHttpVersion().equals(httpVersion);
+    }
+
+    public static String getStringFromClipboard() {
+        try {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            if (clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)){
+                Transferable transferable = clipboard.getContents(null);
+                return (String) transferable.getTransferData(DataFlavor.stringFlavor);
+            }else{
+                return null;
+            }
+        } catch (IOException | UnsupportedFlavorException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
